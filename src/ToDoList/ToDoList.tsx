@@ -11,7 +11,7 @@ export function ToDoList() {
       setNewToDoItem(newNameValue);
     }
   
-    function onClick() {
+    const onClick = () => {
       setToDoList([...toDoList, newToDoItem]);
     }
   
