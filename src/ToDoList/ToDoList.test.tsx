@@ -33,4 +33,19 @@ describe("ToDoList", () => {
             expect(screen.getByText(newToDoItem)).toBeInTheDocument();
         });
     });
+
+    it("should allow the user to delete a to-do-item", async () => {
+        // Arrange
+        const itemToDelete = faker.lorem.word();
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue([itemToDelete]);
+        render(<ToDoList />);
+
+        // Act
+        fireEvent.click(screen.getByLabelText(`delete-${itemToDelete}-0`));
+
+        // Assert
+        await waitFor(() => {
+            expect(screen.queryByText(itemToDelete)).not.toBeInTheDocument();
+        });
+    });
 });

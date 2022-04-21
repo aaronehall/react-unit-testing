@@ -11,17 +11,25 @@ export function ToDoList() {
       setNewToDoItem(newNameValue);
     }
   
-    const onClick = () => {
+    const handleAddItem = () => {
       setToDoList([...toDoList, newToDoItem]);
+    }
+
+    const handleDeleteItem = (itemName: string) => {
+      const newToDoList = toDoList.filter(i => i !== itemName);
+      setToDoList(newToDoList);
     }
   
     return (
       <div>
         <h1>To-Do List</h1>
         <input aria-label="todo-input" onChange={value => onNameChange(value)} /> {" "}
-        <button onClick={() => onClick()}>Add To-Do Item</button>
+        <button onClick={() => handleAddItem()}>Add To-Do Item</button>
         <ul>
-          {toDoList.map((name, index) => <li key={index}>{name}</li>)}
+          {toDoList.map((name, index) => 
+            <li key={`li-${index}`}>{`${name} `} 
+              <button aria-label={`delete-${name}-${index}`} key={`button-${index}`} onClick={() => handleDeleteItem(name)}>X</button>
+            </li>)}
         </ul>
       </div>
     );
