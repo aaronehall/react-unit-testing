@@ -15,8 +15,8 @@ export function ToDoList() {
       setToDoList([...toDoList, newToDoItem]);
     }
 
-    const handleDeleteItem = (itemName: string) => {
-      const newToDoList = toDoList.filter(i => i !== itemName);
+    const handleDeleteItem = (itemIndex: number) => {
+      const newToDoList = toDoList.filter((_, index) => index !== itemIndex);
       setToDoList(newToDoList);
     }
   
@@ -28,7 +28,7 @@ export function ToDoList() {
         <ul>
           {toDoList.map((name, index) => 
             <li key={`li-${index}`}>{`${name} `} 
-              <button aria-label={`delete-${name}-${index}`} key={`button-${index}`} onClick={() => handleDeleteItem(name)}>X</button>
+              <button aria-label={`delete-${name}-${index}`} key={`button-${index}`} onClick={() => handleDeleteItem(index)}>X</button>
             </li>)}
         </ul>
       </div>
