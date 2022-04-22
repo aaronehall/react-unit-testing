@@ -1,20 +1,10 @@
-import { useState, ChangeEvent } from "react";
+import { useState } from "react";
 import { getToDoList } from "../../services/toDoService";
+import { ToDoItemAdder } from "../ToDoItemAdder/ToDoItemAdder";
 
 export function ToDoList() {
     const [toDoList, setToDoList] = useState<string[]>(getToDoList());
-    const [newToDoItem, setNewToDoItem] = useState<string>("");
   
-    const onNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-      e.preventDefault();
-      const newNameValue = e.currentTarget.value;
-      setNewToDoItem(newNameValue);
-    }
-  
-    const handleAddItem = () => {
-      setToDoList([...toDoList, newToDoItem]);
-    }
-
     const handleDeleteItem = (itemIndex: number) => {
       const newToDoList = toDoList.filter((_, index) => index !== itemIndex);
       setToDoList(newToDoList);
@@ -23,8 +13,7 @@ export function ToDoList() {
     return (
       <div>
         <h1>To-Do List</h1>
-        <input aria-label="todo-input" onChange={value => onNameChange(value)} /> {" "}
-        <button onClick={() => handleAddItem()}>Add To-Do Item</button>
+        <ToDoItemAdder handleAddItem={newToDoItem => setToDoList([...toDoList, newToDoItem])}/>
         <ul>
           {toDoList.map((name, index) => 
             <li key={`li-${index}`}>{`${name} `} 
