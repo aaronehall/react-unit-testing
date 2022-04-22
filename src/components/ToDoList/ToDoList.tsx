@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { getToDoList } from "../../services/toDoService";
 import { ToDoItemAdder } from "../ToDoItemAdder/ToDoItemAdder";
+import { ToDoListItem } from "../ToDoListItem/ToDoListItem";
 
-export function ToDoList() {
+export const ToDoList = () => {
     const [toDoList, setToDoList] = useState<string[]>(getToDoList());
   
     const handleDeleteItem = (itemIndex: number) => {
@@ -16,9 +17,12 @@ export function ToDoList() {
         <ToDoItemAdder handleAddItem={newToDoItem => setToDoList([...toDoList, newToDoItem])}/>
         <ul>
           {toDoList.map((name, index) => 
-            <li key={`li-${index}`}>{`${name} `} 
-              <button aria-label={`delete-${name}-${index}`} key={`button-${index}`} onClick={() => handleDeleteItem(index)}>X</button>
-            </li>)}
+            <ToDoListItem 
+              key={index}
+              name={name}
+              index={index}
+              handleDeleteItem={index => handleDeleteItem(index)}
+            />)}
         </ul>
       </div>
     );

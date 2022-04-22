@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ToDoItemAdder } from "./ToDoItemAdder";
 
 describe("ToDoItemAdder", () => {
-    it("should allow the user to add a to-do item", async () => {
+    it("should allow a user to add a to-do item", async () => {
         let actualNewItem = "";
         const handleAddItem = jest.fn(item => actualNewItem = item);
 
