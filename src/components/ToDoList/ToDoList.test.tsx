@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { ToDoList } from "./ToDoList";
-import * as toDoService from "../services/toDoService";
+import * as toDoService from "../../services/toDoService";
 import { faker } from "@faker-js/faker";
 
 describe("ToDoList", () => {
