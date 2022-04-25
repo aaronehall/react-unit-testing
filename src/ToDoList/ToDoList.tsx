@@ -13,6 +13,7 @@ export function ToDoList() {
         setNewToDoItem(newNameValue);
     }
 
+    // TODO: Add validation for duplicates
     const handleAddItem = () => {
         if (newToDoItem === "") {
             setShouldShowErrorText(true)
