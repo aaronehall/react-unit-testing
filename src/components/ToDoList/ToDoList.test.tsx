@@ -37,4 +37,22 @@ describe("ToDoList", () => {
             expect(await screen.findByText(expectedNewItem)).toBeInTheDocument();
         });
     });
+
+    // integration test: List component + Delete component
+    it("should allow the user to delete an item", async () => {
+        // Arrange
+        const toDoItems = [ faker.lorem.word(), faker.lorem.word() ];
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        const itemToDelete = toDoItems[0];
+        const indexOfItemToDelete = 0;
+
+        // Act
+        render(<ToDoList />);
+        fireEvent.click(screen.getByLabelText(`delete-${itemToDelete}-${indexOfItemToDelete}`));
+
+        // Assert
+        await waitFor(() => {
+            expect(screen.queryByLabelText(`delete-${itemToDelete}-${indexOfItemToDelete}`)).not.toBeInTheDocument()
+        });
+    });
 });
