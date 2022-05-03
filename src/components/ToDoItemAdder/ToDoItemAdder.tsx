@@ -12,12 +12,17 @@ export const ToDoItemAdder = ({ setToDoList, toDoList }: ToDoItemAdderProps) => 
         setNewToDoItem(newNameValue);
     };
 
-    // TODO: Add validation for duplicates
     const handleAddItem = () => {
         if (newToDoItem === "") {
-            setShouldShowEmptyErrorText(true)
+            setShouldShowEmptyErrorText(true);
             return;
         }
+
+        if (toDoList.includes(newToDoItem)) {
+            setShouldShowDuplicateErrorText(true);
+            return;
+        }
+
         setToDoList([...toDoList, newToDoItem]);
     }
 

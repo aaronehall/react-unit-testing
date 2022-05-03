@@ -21,4 +21,21 @@ describe("ToDoItemAdder", () => {
             expect(setToDoList).toHaveBeenCalledTimes(1);
         });
     });
+
+    it("should not allow a user to add a duplicate to-do item", async () => {
+        const existingListItem = faker.lorem.word();
+        
+        // Arrange
+        render(<ToDoItemAdder toDoList={[existingListItem]} setToDoList={jest.fn()} />);
+
+        // Act
+        const input = screen.getByLabelText("todo-input");
+        userEvent.paste(input, existingListItem);
+        userEvent.click(screen.getByText("Add To-Do Item"));
+
+        // Assert
+        await waitFor(async () => {
+            expect(await screen.findByText("You already have that on your list")).toBeInTheDocument();
+        });
+    });
 })
