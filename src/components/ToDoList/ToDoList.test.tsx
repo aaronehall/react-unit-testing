@@ -136,4 +136,23 @@ describe("ToDoList", () => {
             expect(screen.queryByText(expectedErrorText)).not.toBeInTheDocument();
         });
     });
+
+    
+    it("should show error text when a user attempts to add a duplicate item", async () => {
+        // Arrange
+        const expectedErrorText = "You already have that on your list";
+        const toDoItems = [faker.lorem.word(), faker.lorem.word()];
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        render(<ToDoList />);
+
+        // Act
+        const input = screen.getByLabelText("todo-input");
+        userEvent.paste(input, toDoItems[0]);
+        userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
+
+        // Assert
+        await waitFor(() => {
+            expect(screen.getByText(expectedErrorText)).toBeInTheDocument();
+        });
+    });
 });
