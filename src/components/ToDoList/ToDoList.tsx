@@ -5,7 +5,6 @@ import { ToDoListItem } from "../ToDoListItem/ToDoListItem";
 
 export const ToDoList = () => {
     const [toDoList, setToDoList] = useState<string[]>(getToDoList());
-
     const [shouldShowCompleteMessage, setShouldShowCompleteMessage] = useState<boolean>(false);
 
     const handleDeleteItem = (itemIndex: number) => {
@@ -22,7 +21,6 @@ export const ToDoList = () => {
             setShouldShowCompleteMessage(true)
         }
     }, [toDoList])
-
 
     return (
         <>
