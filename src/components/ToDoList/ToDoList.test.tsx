@@ -154,5 +154,14 @@ describe("ToDoList", () => {
         await waitFor(() => {
             expect(screen.getByText(expectedErrorText)).toBeInTheDocument();
         });
+
+        // Act
+        userEvent.paste(input, faker.lorem.word());
+        userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
+
+        // Assert
+        await waitFor(() => {
+            expect(screen.queryByText(expectedErrorText)).not.toBeInTheDocument();
+        });
     });
 });

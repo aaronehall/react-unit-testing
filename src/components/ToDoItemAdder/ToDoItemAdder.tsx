@@ -21,6 +21,8 @@ export const ToDoItemAdder = ({ setToDoList, toDoList }: ToDoItemAdderProps) => 
         if (toDoList.includes(newToDoItem)) {
             setShouldShowDuplicateErrorText(true);
             return;
+        } else {
+            setShouldShowDuplicateErrorText(false);
         }
 
         setToDoList([...toDoList, newToDoItem]);
