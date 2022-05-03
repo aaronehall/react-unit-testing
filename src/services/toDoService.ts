@@ -1,4 +1,4 @@
-// Let's pretend this is a DB call
+// Let's pretend this is an API call
 export const getToDoList = () => {
     return [
         "Pick up groceries",
