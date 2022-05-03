@@ -1,3 +1,4 @@
 export interface ToDoItemAdderProps {
-    handleAddItem: (newItem: string) => void;
+   toDoList: string[];
+   setToDoList: (newToDoList: string[]) => void;
 }

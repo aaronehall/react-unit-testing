@@ -1,24 +1,24 @@
 import faker from "@faker-js/faker";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { ToDoItemAdder } from "./ToDoItemAdder";
+import userEvent from "@testing-library/user-event";
 
 describe("ToDoItemAdder", () => {
     it("should allow a user to add a to-do item", async () => {
-        let actualNewItem = "";
-        const handleAddItem = jest.fn(item => actualNewItem = item);
+        const setToDoList = jest.fn();
+        const toDoList = ["Take out trash", "Pay rent", "Mow lawn"];
 
         // Arrange
-        render(<ToDoItemAdder handleAddItem={handleAddItem}/>);
+        render(<ToDoItemAdder toDoList={toDoList} setToDoList={setToDoList} />);
 
         // Act
-        const expectedNewItem = faker.lorem.word();
         const input = screen.getByLabelText("todo-input");
-        fireEvent.change(input, { target: { value: expectedNewItem } });
-        fireEvent.click(screen.getByText("Add To-Do Item"));
+        userEvent.paste(input, faker.lorem.word());
+        userEvent.click(screen.getByText("Add To-Do Item"));
 
         // Assert
         await waitFor(() => {
-            expect(actualNewItem).toBe(expectedNewItem);
+            expect(setToDoList).toHaveBeenCalledTimes(1);
         });
     });
 })
