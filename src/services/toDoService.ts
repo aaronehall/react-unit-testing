@@ -6,6 +6,17 @@ export const getToDoList = async (): Promise<ToDoItem[]> => {
     return response.json();
 }
 
-// TODO: Add POST
+// TODO: return value?
+export const addToDoItem = async (item: string): Promise<Response> => {
+    return await fetch("https://localhost:7016/todoitems", {
+        body: JSON.stringify({
+            description: item
+        }),
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }        
+    });
+}
 
 // TODO: Add DELETE

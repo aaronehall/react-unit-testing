@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
+import { addToDoItem } from "../../services/toDoService";
 import { ToDoItemAdderProps } from "./ToDoItemAdderProps";
 
 export const ToDoItemAdder = ({ setToDoList, toDoList }: ToDoItemAdderProps) => {
@@ -25,7 +26,8 @@ export const ToDoItemAdder = ({ setToDoList, toDoList }: ToDoItemAdderProps) => 
             setShouldShowDuplicateErrorText(false);
         }
 
-        setToDoList([...toDoList, { id: 0, description: newToDoItem }]);
+        addToDoItem(newToDoItem);
+        // setToDoList([...toDoList, { id: 0, description: newToDoItem }]);
     }
 
     useEffect(() => {
