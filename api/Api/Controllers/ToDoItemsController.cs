@@ -25,7 +25,23 @@ namespace Api.Controllers
             _db.ToDoItems.Add(dbModel);
 
             _db.SaveChanges();
-            return Created($"{dbModel.Id}", apiModel);
+            return Created($"{dbModel.Id}", dbModel);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var itemToRemove = _db.ToDoItems.FirstOrDefault(x => x.Id == id);
+
+            if (itemToRemove == null)
+            {
+                return NotFound();
+            }
+
+            _db.ToDoItems.Remove(itemToRemove);
+            _db.SaveChanges();
+
+            return NoContent();
         }
     }
 }
