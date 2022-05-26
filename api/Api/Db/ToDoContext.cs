@@ -6,19 +6,7 @@ namespace Api.Db
     {
         public DbSet<ToDoItem> ToDoItems { get; set; }
 
-        public string DbPath { get; }
-
-        public ToDoContext()
-        {
-            var folder = Environment.SpecialFolder.LocalApplicationData;
-            var path = Environment.GetFolderPath(folder);
-            DbPath = Path.Combine(path, "todo.db");
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-        {
-            options.UseSqlite($"Data Source={DbPath}");
-        }
+        public ToDoContext(DbContextOptions<ToDoContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
