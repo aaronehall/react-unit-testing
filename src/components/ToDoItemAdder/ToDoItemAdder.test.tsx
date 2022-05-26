@@ -2,15 +2,14 @@ import faker from "@faker-js/faker";
 import { render, screen, waitFor } from "@testing-library/react";
 import { ToDoItemAdder } from "./ToDoItemAdder";
 import userEvent from "@testing-library/user-event";
-import { act } from "react-dom/test-utils";
+import { ToDoItem } from "../../services/toDoItem";
 
 describe("ToDoItemAdder", () => {
     it("should allow a user to add a to-do item", async () => {
         const setToDoList = jest.fn();
-        const toDoList = ["Take out trash", "Pay rent", "Mow lawn"];
 
         // Arrange
-        render(<ToDoItemAdder toDoList={toDoList} setToDoList={setToDoList} />);
+        render(<ToDoItemAdder toDoList={createToDoItems(3)} setToDoList={setToDoList} />);
 
         // Act
         const input = screen.getByLabelText("todo-input");
@@ -24,14 +23,14 @@ describe("ToDoItemAdder", () => {
     });
 
     it("should not allow a user to add a duplicate to-do item", async () => {
-        const existingListItem = faker.lorem.word();
+        const existingListItem = createToDoItems(1)[0];
         
         // Arrange
         render(<ToDoItemAdder toDoList={[existingListItem]} setToDoList={jest.fn()} />);
 
         // Act
         const input = screen.getByLabelText("todo-input");
-        userEvent.paste(input, existingListItem);
+        userEvent.paste(input, existingListItem.description);
         userEvent.click(screen.getByText("Add To-Do Item"));
 
         // Assert
@@ -49,3 +48,16 @@ describe("ToDoItemAdder", () => {
         });
     });
 })
+
+export const createToDoItems = (numberToCreate: number = 3): ToDoItem[] => {
+    let items = [];
+
+    for (let i = 0; i < numberToCreate; i++) {
+        items.push({
+            id: i,
+            description: faker.lorem.word()
+        })
+    }
+
+    return items;
+}

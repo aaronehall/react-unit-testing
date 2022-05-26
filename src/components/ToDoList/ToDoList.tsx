@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
+import { ToDoItem } from "../../services/toDoItem";
 import { getToDoList } from "../../services/toDoService";
 import { ToDoItemAdder } from "../ToDoItemAdder/ToDoItemAdder";
 import { ToDoListItem } from "../ToDoListItem/ToDoListItem";
 
 export const ToDoList = () => {
-    const [toDoList, setToDoList] = useState<string[]>(getToDoList());
+    const [toDoList, setToDoList] = useState<ToDoItem[]>();
     const [shouldShowCompleteMessage, setShouldShowCompleteMessage] = useState<boolean>(false);
 
     const handleDeleteItem = (itemIndex: number) => {
-        const newToDoList = toDoList.filter((_, index) => index !== itemIndex);
+        const newToDoList = toDoList?.filter((_, index) => index !== itemIndex);
         setToDoList(newToDoList);
     }
 
@@ -17,7 +18,12 @@ export const ToDoList = () => {
     }
 
     useEffect(() => {
-        if (toDoList.length === 0) {
+        // TODO: Add loader
+        getToDoList().then(response => setToDoList(response));
+    }, []);
+
+    useEffect(() => {
+        if (toDoList?.length === 0) {
             setShouldShowCompleteMessage(true)
         }
     }, [toDoList])
@@ -26,19 +32,19 @@ export const ToDoList = () => {
         <>
             <div>
                 <h1>To-Do List</h1>
-                <ToDoItemAdder toDoList={toDoList} setToDoList={setToDoList} />
+                <ToDoItemAdder toDoList={toDoList ?? []} setToDoList={setToDoList} />
                 <ul>
-                    {toDoList.map((name, index) =>
+                    {toDoList?.map((toDoItem, index) =>
                         <ToDoListItem
                             key={index}
-                            name={name}
+                            name={toDoItem.description}
                             index={index}
                             handleDeleteItem={index => handleDeleteItem(index)}
                         />)}
                 </ul>
             </div>
             <hr />
-            <h3>Number of To-Do List items: {toDoList.length}</h3>
+            <h3>Number of To-Do List items: {toDoList?.length}</h3>
             {shouldShowCompleteMessage && <div>
                 <p>You did everything on your list!</p>
                 <button onClick={handleCompleteModalClose}>OK</button>

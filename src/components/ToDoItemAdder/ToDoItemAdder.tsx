@@ -18,14 +18,14 @@ export const ToDoItemAdder = ({ setToDoList, toDoList }: ToDoItemAdderProps) => 
             return;
         }
 
-        if (toDoList.includes(newToDoItem)) {
+        if (toDoList.find(i => i.description === newToDoItem)) {
             setShouldShowDuplicateErrorText(true);
             return;
         } else {
             setShouldShowDuplicateErrorText(false);
         }
 
-        setToDoList([...toDoList, newToDoItem]);
+        setToDoList([...toDoList, { id: 0, description: newToDoItem }]);
     }
 
     useEffect(() => {

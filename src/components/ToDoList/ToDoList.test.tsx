@@ -3,13 +3,14 @@ import { ToDoList } from "./ToDoList";
 import * as toDoService from "../../services/toDoService";
 import { faker } from "@faker-js/faker";
 import userEvent from "@testing-library/user-event";
+import { ToDoItem } from "../../services/toDoItem";
 
 describe("ToDoList", () => {
     // true unit test
     it("should load list items", () => {
         // Arrange
         const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(createToDoItems()));
 
         // Act
         render(<ToDoList />);
@@ -23,7 +24,7 @@ describe("ToDoList", () => {
     it("should allow the user to add an item", async () => {
         // Arrange
         const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(createToDoItems()));
         const expectedNewItem = faker.lorem.word();
 
         // Act
@@ -43,7 +44,7 @@ describe("ToDoList", () => {
     it("should allow the user to delete an item", async () => {
         // Arrange
         const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(createToDoItems()));
         const itemToDelete = toDoItems[0];
         const indexOfItemToDelete = 0;
 
@@ -60,7 +61,7 @@ describe("ToDoList", () => {
     it("should display the number of to-do items", async () => {
         // Arrange
         const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(createToDoItems()));
         render(<ToDoList />);
 
         expect(screen.getByText("Number of To-Do List items: 2")).toBeInTheDocument();
@@ -80,8 +81,8 @@ describe("ToDoList", () => {
     it("should display a message when the to-do list is complete", async () => {
         // Arrange
         const expectedText = "You did everything on your list!";
-        const itemToDelete = faker.lorem.word();
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue([itemToDelete]);
+        const itemToDelete = createToDoItems(1)[0];
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve([itemToDelete]));
         render(<ToDoList />);
 
         // Act
@@ -96,8 +97,8 @@ describe("ToDoList", () => {
     it("should hide the complete message when the 'OK' button is clicked", async () => {
         // Arrange
         const expectedText = "You did everything on your list!";
-        const itemToDelete = faker.lorem.word();
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue([itemToDelete]);
+        const itemToDelete = createToDoItems(1)[0];
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve([itemToDelete]));
         render(<ToDoList />);
 
         // Act
@@ -113,8 +114,8 @@ describe("ToDoList", () => {
     it("should show error text when an empty item is attempted to be added", async () => {
         // Arrange
         const expectedErrorText = "You must enter something";
-        const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        const toDoItems = createToDoItems(2);
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(toDoItems));
         render(<ToDoList />);
 
         // Act
@@ -141,13 +142,13 @@ describe("ToDoList", () => {
     it("should show error text when a user attempts to add a duplicate item", async () => {
         // Arrange
         const expectedErrorText = "You already have that on your list";
-        const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        const toDoItems = createToDoItems(2);
+        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(toDoItems));
         render(<ToDoList />);
 
         // Act
         const input = screen.getByLabelText("todo-input");
-        userEvent.paste(input, toDoItems[0]);
+        userEvent.paste(input, toDoItems[0].description);
         userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
 
         // Assert
@@ -165,3 +166,16 @@ describe("ToDoList", () => {
         });
     });
 });
+
+export const createToDoItems = (numberToCreate: number = 3): ToDoItem[] => {
+    let items = [];
+
+    for (let i = 0; i < numberToCreate; i++) {
+        items.push({
+            id: i,
+            description: faker.lorem.word()
+        })
+    }
+
+    return items;
+}
