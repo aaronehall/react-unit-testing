@@ -9,7 +9,7 @@ describe("ToDoItemAdder", () => {
         const setToDoList = jest.fn();
 
         // Arrange
-        render(<ToDoItemAdder toDoList={createToDoItems(3)} setToDoList={setToDoList} />);
+        render(<ToDoItemAdder toDoList={createToDoItems(3)} handleAdd={setToDoList} />);
 
         // Act
         const input = screen.getByLabelText("todo-input");
@@ -26,7 +26,7 @@ describe("ToDoItemAdder", () => {
         const existingListItem = createToDoItems(1)[0];
         
         // Arrange
-        render(<ToDoItemAdder toDoList={[existingListItem]} setToDoList={jest.fn()} />);
+        render(<ToDoItemAdder toDoList={[existingListItem]} handleAdd={jest.fn()} />);
 
         // Act
         const input = screen.getByLabelText("todo-input");

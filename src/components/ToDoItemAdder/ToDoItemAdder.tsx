@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { addToDoItem } from "../../services/toDoService";
 import { ToDoItemAdderProps } from "./ToDoItemAdderProps";
 
-export const ToDoItemAdder = ({ setToDoList, toDoList }: ToDoItemAdderProps) => {
+export const ToDoItemAdder = ({ handleAdd, toDoList }: ToDoItemAdderProps) => {
     const [newToDoItem, setNewToDoItem] = useState<string>("");
     const [shouldShowEmptyErrorText, setShouldShowEmptyErrorText] = useState<boolean>(false);
     const [shouldShowDuplicateErrorText, setShouldShowDuplicateErrorText] = useState<boolean>(false);
@@ -27,7 +27,7 @@ export const ToDoItemAdder = ({ setToDoList, toDoList }: ToDoItemAdderProps) => 
         }
 
         addToDoItem(newToDoItem);
-        // setToDoList([...toDoList, { id: 0, description: newToDoItem }]);
+        handleAdd();
     }
 
     useEffect(() => {

@@ -7,6 +7,7 @@ import { ToDoListItem } from "../ToDoListItem/ToDoListItem";
 export const ToDoList = () => {
     const [toDoList, setToDoList] = useState<ToDoItem[]>();
     const [shouldShowCompleteMessage, setShouldShowCompleteMessage] = useState<boolean>(false);
+    const [reload, setReload] = useState<boolean>(true);
 
     const handleDeleteItem = (itemIndex: number) => {
         const newToDoList = toDoList?.filter((_, index) => index !== itemIndex);
@@ -19,8 +20,11 @@ export const ToDoList = () => {
 
     useEffect(() => {
         // TODO: Add loader
-        getToDoList().then(response => setToDoList(response));
-    }, []);
+        if (reload) {
+            getToDoList().then(response => setToDoList(response));
+            setReload(false);
+        }
+    }, [reload]);
 
     useEffect(() => {
         if (toDoList?.length === 0) {
@@ -32,7 +36,7 @@ export const ToDoList = () => {
         <>
             <div>
                 <h1>To-Do List</h1>
-                <ToDoItemAdder toDoList={toDoList ?? []} setToDoList={setToDoList} />
+                <ToDoItemAdder toDoList={toDoList ?? []} handleAdd={() => setReload(true)} />
                 <ul>
                     {toDoList?.map((toDoItem, index) =>
                         <ToDoListItem
