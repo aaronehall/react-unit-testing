@@ -6,10 +6,10 @@ import { ToDoItem } from "../../services/toDoItem";
 
 describe("ToDoItemAdder", () => {
     it("should allow a user to add a to-do item", async () => {
-        const setToDoList = jest.fn();
+        const handleAddMock = jest.fn();
 
         // Arrange
-        render(<ToDoItemAdder toDoList={createToDoItems(3)} handleAdd={setToDoList} />);
+        render(<ToDoItemAdder toDoList={createToDoItems(3)} handleAdd={handleAddMock} />);
 
         // Act
         const input = screen.getByLabelText("todo-input");
@@ -18,7 +18,7 @@ describe("ToDoItemAdder", () => {
 
         // Assert
         await waitFor(() => {
-            expect(setToDoList).toHaveBeenCalledTimes(1);
+            expect(handleAddMock).toHaveBeenCalledTimes(1);
         });
     });
 
