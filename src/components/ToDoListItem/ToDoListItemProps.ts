@@ -1,5 +1,6 @@
+import { ToDoItem } from "../../services/toDoItem";
+
 export interface ToDoListItemProps {
-    name: string;
-    index: number;
-    handleDeleteItem: (index: number) => void;
+    toDoItem: ToDoItem;
+    handleDelete: () => void;
 }

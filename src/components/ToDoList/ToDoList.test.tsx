@@ -52,17 +52,20 @@ describe("ToDoList", () => {
     it("should allow the user to delete an item", async () => {
         // Arrange
         const toDoItems = createToDoItems();
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(toDoItems));
-        const descriptionOfitemToDelete = toDoItems[0].description;
-        const indexOfItemToDelete = 0;
+        const toDoItemsWithoutFirstItem = toDoItems.filter(i => i.id !== toDoItems[0].id);
+        jest.spyOn(toDoService, "getToDoList")
+            .mockReturnValueOnce(Promise.resolve(toDoItems)) // initial load
+            .mockReturnValueOnce(Promise.resolve(toDoItemsWithoutFirstItem)); // after deletion
+        jest.spyOn(toDoService, "deleteToDoItem").mockReturnValue(Promise.resolve(new Response()));
+        const deleteButtonSelector = `delete-${toDoItems[0].description}-${toDoItems[0].id}`;
 
         // Act
         render(<ToDoList />);
-        userEvent.click(await screen.findByLabelText(`delete-${descriptionOfitemToDelete}-${indexOfItemToDelete}`));
+        userEvent.click(await screen.findByLabelText(deleteButtonSelector));
 
         // Assert
         await waitFor(() => {
-            expect(screen.queryByLabelText(`delete-${descriptionOfitemToDelete}-${indexOfItemToDelete}`)).not.toBeInTheDocument()
+            expect(screen.queryByLabelText(deleteButtonSelector)).not.toBeInTheDocument()
         });
     });
 
@@ -98,13 +101,14 @@ describe("ToDoList", () => {
         // Arrange
         const expectedText = "You did everything on your list!";
         const toDoItems = createToDoItems(1);
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(toDoItems));
-        const descriptionOfitemToDelete = toDoItems[0].description;
-        const indexOfItemToDelete = 0;
+        jest.spyOn(toDoService, "getToDoList")
+            .mockReturnValueOnce(Promise.resolve(toDoItems)) // initial load
+            .mockReturnValueOnce(Promise.resolve([])); // after delete
+        jest.spyOn(toDoService, "deleteToDoItem").mockReturnValue(Promise.resolve(new Response()));
 
         // Act
         render(<ToDoList />);
-        userEvent.click(await screen.findByLabelText(`delete-${descriptionOfitemToDelete}-${indexOfItemToDelete}`));
+        userEvent.click(await screen.findByLabelText(`delete-${toDoItems[0].description}-${toDoItems[0].id}`));
 
         // Assert
         await waitFor(async () => {
@@ -116,12 +120,15 @@ describe("ToDoList", () => {
         // Arrange
         const expectedText = "You did everything on your list!";
         const itemToDelete = createToDoItems(1)[0];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve([itemToDelete]));
+        jest.spyOn(toDoService, "getToDoList")
+            .mockReturnValueOnce(Promise.resolve([itemToDelete])) // initial load
+            .mockReturnValueOnce(Promise.resolve([])); // after delete
+        
         render(<ToDoList />);
 
         // Act
-        userEvent.click(await screen.findByLabelText(`delete-${itemToDelete.description}-0`));
-        userEvent.click(screen.getByRole('button', { name: 'OK' }))
+        userEvent.click(await screen.findByLabelText(`delete-${itemToDelete.description}-${itemToDelete.id}`));
+        userEvent.click(await screen.findByRole("button", { name: "OK" }))
 
         // Assert
         await waitFor(() => {

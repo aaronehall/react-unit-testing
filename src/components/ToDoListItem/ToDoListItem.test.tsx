@@ -1,23 +1,22 @@
 import faker from "@faker-js/faker";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { ToDoItem } from "../../services/toDoItem";
 import { ToDoListItem } from "./ToDoListItem";
 
 describe("ToDoListItem", () => {
     it("should allow a user to delete a to-do item", async () => {
         // Arrange
-        const item = faker.lorem.word();
-        const expectedItemIndex = Math.random() * 100;
-        let actualItemIndex = 0;
-        const handleDeleteItem = jest.fn((_, index) => actualItemIndex = index);
+        const item: ToDoItem = { id: Math.random() * 100, description: faker.lorem.word() }
+        const handleDeleteItemMock = jest.fn();
 
-        render(<ToDoListItem name={item} index={expectedItemIndex} handleDeleteItem={itemIndex => handleDeleteItem(item, itemIndex)}/>)
+        render(<ToDoListItem toDoItem={item} handleDelete={handleDeleteItemMock}/>)
 
         // Act
-        fireEvent.click(screen.getByLabelText(`delete-${item}-${expectedItemIndex}`));
+        fireEvent.click(screen.getByLabelText(`delete-${item.description}-${item.id}`));
 
         // Assert
         await waitFor(() => {
-            expect(expectedItemIndex).toBe(actualItemIndex);
+            expect(handleDeleteItemMock).toBeCalledTimes(1);
         });
     });
 });

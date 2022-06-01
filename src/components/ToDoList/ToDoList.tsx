@@ -9,11 +9,6 @@ export const ToDoList = () => {
     const [shouldShowCompleteMessage, setShouldShowCompleteMessage] = useState<boolean>(false);
     const [fetchToDoItems, setFetchToDoItems] = useState<boolean>(true);
 
-    const handleDeleteItem = (itemIndex: number) => {
-        const newToDoList = toDoList?.filter((_, index) => index !== itemIndex);
-        setToDoList(newToDoList);
-    }
-
     const handleCompleteModalClose = () => {
         setShouldShowCompleteMessage(false);
     }
@@ -41,9 +36,8 @@ export const ToDoList = () => {
                     {toDoList?.map((toDoItem, index) =>
                         <ToDoListItem
                             key={index}
-                            name={toDoItem.description}
-                            index={index}
-                            handleDeleteItem={index => handleDeleteItem(index)}
+                            toDoItem={toDoItem}
+                            handleDelete={() => setFetchToDoItems(true)}
                         />)}
                 </ul>
             </div>

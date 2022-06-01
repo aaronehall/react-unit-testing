@@ -13,7 +13,7 @@ export const ToDoItemAdder = ({ handleAdd, toDoList }: ToDoItemAdderProps) => {
         setNewToDoItem(newNameValue);
     };
 
-    const handleAddItem = () => {
+    const onAdd = () => {
         if (newToDoItem === "") {
             setShouldShowEmptyErrorText(true);
             return;
@@ -41,6 +41,6 @@ export const ToDoItemAdder = ({ handleAdd, toDoList }: ToDoItemAdderProps) => {
             {shouldShowEmptyErrorText && <p style={{ color: "red" }}>You must enter something</p>}
             {shouldShowDuplicateErrorText && <p style={{ color: "red" }}>You already have that on your list</p>}
             <input aria-label="todo-input" onChange={value => onNameChange(value)} /> {" "}
-            <button onClick={handleAddItem}>Add To-Do Item</button>
+            <button onClick={onAdd}>Add To-Do Item</button>
         </>);
 }
