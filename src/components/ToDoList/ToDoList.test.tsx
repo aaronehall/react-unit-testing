@@ -20,9 +20,7 @@ describe("ToDoList", () => {
             expect(screen.getByText(toDoItems[0].description)).toBeInTheDocument();
         }));
 
-        await (waitFor(() => {
-            expect(screen.getByText(toDoItems[1].description)).toBeInTheDocument();
-        }));
+        expect(await screen.findByText(toDoItems[1].description)).toBeInTheDocument();
     })
 
     // integration test: List component + Add component
