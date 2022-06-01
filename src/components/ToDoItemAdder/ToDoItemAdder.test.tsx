@@ -8,7 +8,7 @@ import * as toDoService from "../../services/toDoService";
 describe("ToDoItemAdder", () => {
     it("should allow a user to add a to-do item", async () => {
         const handleAddMock = jest.fn();
-        jest.spyOn(toDoService, "addToDoItem").mockImplementation(() => Promise.resolve(new Response()));
+        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
 
         // Arrange
         render(<ToDoItemAdder toDoList={createToDoItems(3)} handleAdd={handleAddMock} />);
@@ -26,7 +26,7 @@ describe("ToDoItemAdder", () => {
 
     it("should not allow a user to add a duplicate to-do item", async () => {
         const existingListItem = createToDoItems(1)[0];
-        jest.spyOn(toDoService, "addToDoItem").mockImplementation(() => Promise.resolve(new Response()));
+        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
         
         // Arrange
         render(<ToDoItemAdder toDoList={[existingListItem]} handleAdd={jest.fn()} />);

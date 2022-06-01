@@ -8,7 +8,7 @@ describe("ToDoListItem", () => {
     it("should allow a user to delete a to-do item", async () => {
         // Arrange
         const item: ToDoItem = { id: Math.random() * 100, description: faker.lorem.word() }
-        jest.spyOn(toDoService, "deleteToDoItem").mockImplementation(() => Promise.resolve(new Response()));
+        jest.spyOn(toDoService, "deleteToDoItem").mockResolvedValue(new Response());
         const handleDeleteItemMock = jest.fn();
 
         render(<ToDoListItem toDoItem={item} handleDelete={handleDeleteItemMock}/>)
