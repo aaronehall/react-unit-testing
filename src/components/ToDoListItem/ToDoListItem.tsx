@@ -3,8 +3,11 @@ import { ToDoListItemProps } from "./ToDoListItemProps";
 
 export const ToDoListItem = ({toDoItem, handleDelete}: ToDoListItemProps) => {
     const onDelete = (id: number) => {
-        deleteToDoItem(id);
-        handleDelete();
+        deleteToDoItem(id).then((response: Response) => {
+            if (response.ok) {
+                handleDelete();
+            }
+        });
     };
 
     return (

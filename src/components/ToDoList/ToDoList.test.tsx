@@ -10,7 +10,7 @@ describe("ToDoList", () => {
     it("should load list items", async () => {
         // Arrange
         const toDoItems = createToDoItems(2);
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(toDoItems));
+        jest.spyOn(toDoService, "getToDoList").mockImplementation(() => Promise.resolve(toDoItems));
 
         // Act
         render(<ToDoList />);
@@ -30,10 +30,10 @@ describe("ToDoList", () => {
         // Arrange
         const expectedNewItem = faker.lorem.word();
         jest.spyOn(toDoService, "getToDoList")
-            .mockReturnValueOnce(Promise.resolve([])) // initial load
-            .mockReturnValueOnce(Promise.resolve([  // when component reloads
+            .mockImplementationOnce(() => Promise.resolve([])) // initial load
+            .mockImplementationOnce(() => Promise.resolve([  // when component reloads
                 { id: Math.random() * 100, description: expectedNewItem }])); 
-        jest.spyOn(toDoService, "addToDoItem").mockReturnValue(Promise.resolve(new Response()));
+        jest.spyOn(toDoService, "addToDoItem").mockImplementation(() => Promise.resolve(new Response()));
 
         // Act
         render(<ToDoList />);
@@ -54,9 +54,9 @@ describe("ToDoList", () => {
         const toDoItems = createToDoItems();
         const toDoItemsWithoutFirstItem = toDoItems.filter(i => i.id !== toDoItems[0].id);
         jest.spyOn(toDoService, "getToDoList")
-            .mockReturnValueOnce(Promise.resolve(toDoItems)) // initial load
-            .mockReturnValueOnce(Promise.resolve(toDoItemsWithoutFirstItem)); // after deletion
-        jest.spyOn(toDoService, "deleteToDoItem").mockReturnValue(Promise.resolve(new Response()));
+            .mockImplementationOnce(() => Promise.resolve(toDoItems)) // initial load
+            .mockImplementationOnce(() => Promise.resolve(toDoItemsWithoutFirstItem)); // after deletion
+        jest.spyOn(toDoService, "deleteToDoItem").mockImplementation(() => Promise.resolve(new Response()));
         const deleteButtonSelector = `delete-${toDoItems[0].description}-${toDoItems[0].id}`;
 
         // Act
@@ -74,9 +74,9 @@ describe("ToDoList", () => {
         const toDoItems = createToDoItems(2);
         const expectedNewItem = createToDoItems(1)[0];
         jest.spyOn(toDoService, "getToDoList")
-            .mockReturnValueOnce(Promise.resolve(toDoItems)) // initial load
-            .mockReturnValueOnce(Promise.resolve([...toDoItems, expectedNewItem])); 
-        jest.spyOn(toDoService, "addToDoItem").mockReturnValue(Promise.resolve(new Response()));
+            .mockImplementationOnce(() => Promise.resolve(toDoItems)) // initial load
+            .mockImplementationOnce(() => Promise.resolve([...toDoItems, expectedNewItem])); 
+        jest.spyOn(toDoService, "addToDoItem").mockImplementation(() => Promise.resolve(new Response()));
 
         // Act
         render(<ToDoList />);
@@ -102,9 +102,9 @@ describe("ToDoList", () => {
         const expectedText = "You did everything on your list!";
         const toDoItems = createToDoItems(1);
         jest.spyOn(toDoService, "getToDoList")
-            .mockReturnValueOnce(Promise.resolve(toDoItems)) // initial load
-            .mockReturnValueOnce(Promise.resolve([])); // after delete
-        jest.spyOn(toDoService, "deleteToDoItem").mockReturnValue(Promise.resolve(new Response()));
+            .mockImplementationOnce(() => Promise.resolve(toDoItems)) // initial load
+            .mockImplementationOnce(() => Promise.resolve([])); // after delete
+        jest.spyOn(toDoService, "deleteToDoItem").mockImplementation(() => Promise.resolve(new Response()));
 
         // Act
         render(<ToDoList />);
@@ -121,9 +121,10 @@ describe("ToDoList", () => {
         const expectedText = "You did everything on your list!";
         const itemToDelete = createToDoItems(1)[0];
         jest.spyOn(toDoService, "getToDoList")
-            .mockReturnValueOnce(Promise.resolve([itemToDelete])) // initial load
-            .mockReturnValueOnce(Promise.resolve([])); // after delete
-        
+            .mockImplementationOnce(() => Promise.resolve([itemToDelete])) // initial load
+            .mockImplementationOnce(() => Promise.resolve([])); // after delete
+        jest.spyOn(toDoService, "deleteToDoItem").mockImplementation(() => Promise.resolve(new Response()));
+
         render(<ToDoList />);
 
         // Act
@@ -136,11 +137,13 @@ describe("ToDoList", () => {
         });
     });
 
-    it("should show error text when an empty item is attempted to be added", async () => {
+    it("should show error text when user attempts to add an empty item", async () => {
         // Arrange
         const expectedErrorText = "You must enter something";
         const toDoItems = createToDoItems(2);
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(toDoItems));
+        jest.spyOn(toDoService, "getToDoList").mockImplementation(() => Promise.resolve(toDoItems));
+        jest.spyOn(toDoService, "addToDoItem").mockImplementation(() => Promise.resolve(new Response()));
+        
         render(<ToDoList />);
 
         // Act
@@ -168,13 +171,14 @@ describe("ToDoList", () => {
         // Arrange
         const expectedErrorText = "You already have that on your list";
         const toDoItems = createToDoItems(2);
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(Promise.resolve(toDoItems));
+        jest.spyOn(toDoService, "getToDoList").mockImplementation(() => Promise.resolve(toDoItems));
+        jest.spyOn(toDoService, "addToDoItem").mockImplementation(() => Promise.resolve(new Response()));
         render(<ToDoList />);
 
         // Act
         const input = await screen.findByLabelText("todo-input");
         userEvent.paste(input, toDoItems[0].description);
-        userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
+        userEvent.click(await screen.findByRole("button", { name: "Add To-Do Item" }));
 
         // Assert
         await waitFor(() => {

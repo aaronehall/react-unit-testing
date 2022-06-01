@@ -26,8 +26,11 @@ export const ToDoItemAdder = ({ handleAdd, toDoList }: ToDoItemAdderProps) => {
             setShouldShowDuplicateErrorText(false);
         }
 
-        addToDoItem(newToDoItem);
-        handleAdd();
+        addToDoItem(newToDoItem).then((response: Response) => {
+            if (response.ok) {
+                handleAdd();
+            }
+        });
     }
 
     useEffect(() => {
