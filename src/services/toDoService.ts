@@ -1,14 +1,16 @@
 import { ToDoItem } from "./toDoItem";
 
+const baseUrl = "https://localhost:7016/todoitems";
+
 export const getToDoList = async (): Promise<ToDoItem[]> => {
-    const response = await fetch("https://localhost:7016/todoitems");
+    const response = await fetch(baseUrl);
 
     return response.json();
 }
 
 // TODO: return value?
 export const addToDoItem = async (item: string): Promise<Response> => {
-    return await fetch("https://localhost:7016/todoitems", {
+    return await fetch(baseUrl, {
         body: JSON.stringify({
             description: item
         }),
@@ -19,4 +21,8 @@ export const addToDoItem = async (item: string): Promise<Response> => {
     });
 }
 
-// TODO: Add DELETE
+export const deleteToDoItem = async (id: number): Promise<Response> => {
+    return await fetch(`${baseUrl}/${id}`, {
+        method: "DELETE"
+    });
+}
