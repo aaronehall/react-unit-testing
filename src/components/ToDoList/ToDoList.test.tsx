@@ -79,8 +79,8 @@ describe("ToDoList", () => {
         render(<ToDoList />);
 
         // Assert
-        await waitFor(() => {
-            expect(screen.getByText("Number of To-Do List items: 2")).toBeInTheDocument();
+        await waitFor(async () => {
+            expect(await screen.findByText("Number of To-Do List items: 2")).toBeInTheDocument();
         });
 
         // Act
@@ -89,8 +89,8 @@ describe("ToDoList", () => {
         userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
 
         // Assert
-        await waitFor(() => {
-            expect(screen.getByText("Number of To-Do List items: 3")).toBeInTheDocument();
+        await waitFor(async () => {
+            expect(await screen.findByText("Number of To-Do List items: 3")).toBeInTheDocument();
         });
     });
 
