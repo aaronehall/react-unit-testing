@@ -1,4 +1,6 @@
+import { ToDoItem } from "../../services/toDoItem";
+
 export interface ToDoItemAdderProps {
-   toDoList: string[];
-   setToDoList: (newToDoList: string[]) => void;
+   toDoList: ToDoItem[];
+   handleAdd: () => void;
 }

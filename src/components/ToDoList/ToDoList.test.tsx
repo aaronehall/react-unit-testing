@@ -3,106 +3,119 @@ import { ToDoList } from "./ToDoList";
 import * as toDoService from "../../services/toDoService";
 import { faker } from "@faker-js/faker";
 import userEvent from "@testing-library/user-event";
+import { ToDoItem } from "../../services/toDoItem";
 
 describe("ToDoList", () => {
     // true unit test
-    it("should load list items", () => {
+    it("should load list items", async () => {
         // Arrange
-        const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        const toDoItems = createToDoItems(2);
+        jest.spyOn(toDoService, "getToDoList").mockResolvedValue(toDoItems);
 
         // Act
         render(<ToDoList />);
 
         // Assert
-        expect(screen.getByText(toDoItems[0])).toBeInTheDocument();
-        expect(screen.getByText(toDoItems[1])).toBeInTheDocument();
-    });
+        expect(await screen.findByText(toDoItems[0].description)).toBeInTheDocument();
+        expect(await screen.findByText(toDoItems[1].description)).toBeInTheDocument();
+    })
 
     // integration test: List component + Add component
     it("should allow the user to add an item", async () => {
         // Arrange
-        const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
         const expectedNewItem = faker.lorem.word();
+        jest.spyOn(toDoService, "getToDoList")
+            .mockResolvedValueOnce([]) // initial load
+            .mockResolvedValueOnce([ { id: Math.random() * 100, description: expectedNewItem }]); // when component reloads
+        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
 
         // Act
         render(<ToDoList />);
 
-        const input = screen.getByLabelText("todo-input");
+        const input = await screen.findByLabelText("todo-input");
         userEvent.paste(input, expectedNewItem);
         userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
 
         // Assert
-        await waitFor(async () => {
-            expect(await screen.findByText(expectedNewItem)).toBeInTheDocument();
-        });
+        expect(await screen.findByText(expectedNewItem)).toBeInTheDocument();
     });
 
     // integration test: List component + Delete component
     it("should allow the user to delete an item", async () => {
         // Arrange
-        const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
-        const itemToDelete = toDoItems[0];
-        const indexOfItemToDelete = 0;
+        const toDoItems = createToDoItems();
+        const toDoItemsWithoutFirstItem = toDoItems.filter(i => i.id !== toDoItems[0].id);
+        jest.spyOn(toDoService, "getToDoList")
+            .mockResolvedValueOnce(toDoItems) // initial load
+            .mockResolvedValueOnce(toDoItemsWithoutFirstItem); // after deletion
+        jest.spyOn(toDoService, "deleteToDoItem").mockResolvedValue(new Response());
+        const deleteButtonSelector = `delete-${toDoItems[0].description}-${toDoItems[0].id}`;
 
         // Act
         render(<ToDoList />);
-        userEvent.click(screen.getByLabelText(`delete-${itemToDelete}-${indexOfItemToDelete}`));
+        userEvent.click(await screen.findByLabelText(deleteButtonSelector));
 
         // Assert
         await waitFor(() => {
-            expect(screen.queryByLabelText(`delete-${itemToDelete}-${indexOfItemToDelete}`)).not.toBeInTheDocument()
+            expect(screen.queryByLabelText(deleteButtonSelector)).not.toBeInTheDocument()
         });
     });
 
     it("should display the number of to-do items", async () => {
         // Arrange
-        const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
-        render(<ToDoList />);
-
-        expect(screen.getByText("Number of To-Do List items: 2")).toBeInTheDocument();
+        const toDoItems = createToDoItems(2);
+        const expectedNewItem = createToDoItems(1)[0];
+        jest.spyOn(toDoService, "getToDoList")
+            .mockResolvedValueOnce(toDoItems) // initial load
+            .mockResolvedValueOnce([...toDoItems, expectedNewItem]); // when component reloads
+        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
 
         // Act
-        const newToDoItem = faker.lorem.word();
-        const input = screen.getByLabelText("todo-input");
-        userEvent.paste(input, newToDoItem);
+        render(<ToDoList />);
+
+        // Assert
+        expect(await screen.findByText("Number of To-Do List items: 2")).toBeInTheDocument();
+
+        // Act
+        const input = await screen.findByLabelText("todo-input");
+        userEvent.paste(input, expectedNewItem.description);
         userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
 
         // Assert
-        await waitFor(() => {
-            expect(screen.getByText("Number of To-Do List items: 3")).toBeInTheDocument();
-        });
+        expect(await screen.findByText("Number of To-Do List items: 3")).toBeInTheDocument();
     });
 
     it("should display a message when the to-do list is complete", async () => {
         // Arrange
         const expectedText = "You did everything on your list!";
-        const itemToDelete = faker.lorem.word();
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue([itemToDelete]);
-        render(<ToDoList />);
+        const toDoItems = createToDoItems(1);
+        jest.spyOn(toDoService, "getToDoList")
+            .mockResolvedValueOnce(toDoItems) // initial load
+            .mockResolvedValueOnce([]); // after delete
+        jest.spyOn(toDoService, "deleteToDoItem").mockResolvedValue(new Response());
 
         // Act
-        userEvent.click(screen.getByLabelText(`delete-${itemToDelete}-0`));
+        render(<ToDoList />);
+        userEvent.click(await screen.findByLabelText(`delete-${toDoItems[0].description}-${toDoItems[0].id}`));
 
         // Assert
-        await waitFor(() => {
-            expect(screen.getByText(expectedText)).toBeInTheDocument();
-        });
+        expect(await screen.findByText(expectedText)).toBeInTheDocument();
     });
 
     it("should hide the complete message when the 'OK' button is clicked", async () => {
         // Arrange
         const expectedText = "You did everything on your list!";
-        const itemToDelete = faker.lorem.word();
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue([itemToDelete]);
+        const itemToDelete = createToDoItems(1)[0];
+        jest.spyOn(toDoService, "getToDoList")
+            .mockResolvedValueOnce([itemToDelete]) // initial load
+            .mockResolvedValueOnce([]); // after delete
+        jest.spyOn(toDoService, "deleteToDoItem").mockResolvedValue(new Response());
+
         render(<ToDoList />);
 
         // Act
-        userEvent.click(screen.getByLabelText(`delete-${itemToDelete}-0`));
-        userEvent.click(screen.getByRole('button', { name: 'OK' }))
+        userEvent.click(await screen.findByLabelText(`delete-${itemToDelete.description}-${itemToDelete.id}`));
+        userEvent.click(await screen.findByRole("button", { name: "OK" }))
 
         // Assert
         await waitFor(() => {
@@ -110,11 +123,13 @@ describe("ToDoList", () => {
         });
     });
 
-    it("should show error text when an empty item is attempted to be added", async () => {
+    it("should show error text when user attempts to add an empty item", async () => {
         // Arrange
         const expectedErrorText = "You must enter something";
-        const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        const toDoItems = createToDoItems(2);
+        jest.spyOn(toDoService, "getToDoList").mockResolvedValue(toDoItems);
+        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
+        
         render(<ToDoList />);
 
         // Act
@@ -123,9 +138,7 @@ describe("ToDoList", () => {
         userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
 
         // Assert
-        await waitFor(() => {
-            expect(screen.getByText(expectedErrorText)).toBeInTheDocument();
-        });
+        expect(await screen.findByText(expectedErrorText)).toBeInTheDocument();
 
         // Act
         userEvent.paste(input, "Something");
@@ -137,27 +150,25 @@ describe("ToDoList", () => {
         });
     });
 
-    
     it("should show error text when a user attempts to add a duplicate item", async () => {
         // Arrange
         const expectedErrorText = "You already have that on your list";
-        const toDoItems = [faker.lorem.word(), faker.lorem.word()];
-        jest.spyOn(toDoService, "getToDoList").mockReturnValue(toDoItems);
+        const toDoItems = createToDoItems(2);
+        jest.spyOn(toDoService, "getToDoList").mockResolvedValue(toDoItems);
+        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
         render(<ToDoList />);
 
         // Act
-        const input = screen.getByLabelText("todo-input");
-        userEvent.paste(input, toDoItems[0]);
-        userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
+        const input = await screen.findByLabelText("todo-input");
+        userEvent.paste(input, toDoItems[0].description);
+        userEvent.click(await screen.findByRole("button", { name: "Add To-Do Item" }));
 
         // Assert
-        await waitFor(() => {
-            expect(screen.getByText(expectedErrorText)).toBeInTheDocument();
-        });
+        expect(await screen.findByText(expectedErrorText)).toBeInTheDocument();
 
         // Act
         userEvent.paste(input, faker.lorem.word());
-        userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
+        userEvent.click(await screen.findByRole("button", { name: "Add To-Do Item" }));
 
         // Assert
         await waitFor(() => {
@@ -165,3 +176,16 @@ describe("ToDoList", () => {
         });
     });
 });
+
+export const createToDoItems = (numberToCreate: number = 3): ToDoItem[] => {
+    let items = [];
+
+    for (let i = 0; i < numberToCreate; i++) {
+        items.push({
+            id: i,
+            description: faker.lorem.word()
+        })
+    }
+
+    return items;
+}

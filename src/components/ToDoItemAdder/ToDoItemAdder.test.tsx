@@ -2,15 +2,16 @@ import faker from "@faker-js/faker";
 import { render, screen, waitFor } from "@testing-library/react";
 import { ToDoItemAdder } from "./ToDoItemAdder";
 import userEvent from "@testing-library/user-event";
-import { act } from "react-dom/test-utils";
+import { ToDoItem } from "../../services/toDoItem";
+import * as toDoService from "../../services/toDoService";
 
 describe("ToDoItemAdder", () => {
     it("should allow a user to add a to-do item", async () => {
-        const setToDoList = jest.fn();
-        const toDoList = ["Take out trash", "Pay rent", "Mow lawn"];
+        const handleAddMock = jest.fn();
+        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
 
         // Arrange
-        render(<ToDoItemAdder toDoList={toDoList} setToDoList={setToDoList} />);
+        render(<ToDoItemAdder toDoList={createToDoItems(3)} handleAdd={handleAddMock} />);
 
         // Act
         const input = screen.getByLabelText("todo-input");
@@ -19,19 +20,20 @@ describe("ToDoItemAdder", () => {
 
         // Assert
         await waitFor(() => {
-            expect(setToDoList).toHaveBeenCalledTimes(1);
+            expect(handleAddMock).toHaveBeenCalledTimes(1);
         });
     });
 
     it("should not allow a user to add a duplicate to-do item", async () => {
-        const existingListItem = faker.lorem.word();
+        const existingListItem = createToDoItems(1)[0];
+        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
         
         // Arrange
-        render(<ToDoItemAdder toDoList={[existingListItem]} setToDoList={jest.fn()} />);
+        render(<ToDoItemAdder toDoList={[existingListItem]} handleAdd={jest.fn()} />);
 
         // Act
         const input = screen.getByLabelText("todo-input");
-        userEvent.paste(input, existingListItem);
+        userEvent.paste(input, existingListItem.description);
         userEvent.click(screen.getByText("Add To-Do Item"));
 
         // Assert
@@ -49,3 +51,16 @@ describe("ToDoItemAdder", () => {
         });
     });
 })
+
+export const createToDoItems = (numberToCreate: number = 3): ToDoItem[] => {
+    let items = [];
+
+    for (let i = 0; i < numberToCreate; i++) {
+        items.push({
+            id: i,
+            description: faker.lorem.word()
+        })
+    }
+
+    return items;
+}
