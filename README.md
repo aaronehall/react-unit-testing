@@ -2,11 +2,13 @@
 This is a simple app that illustrates basic React concepts. It uses the following technologies:
 
 - UI
+    - TypeScript
     - React
     - react-testing-library
     - Jest
+    - create-react-app
 - Backend
-    - .NET 6 (API)
+    - C# / .NET 6 (API)
     - SQLite (data store)
 
 ## Run the API
