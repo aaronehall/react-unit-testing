@@ -7,48 +7,11 @@ import * as toDoService from "../../services/toDoService";
 
 describe("ToDoItemAdder", () => {
     it("should allow a user to add a to-do item", async () => {
-        const handleAddMock = jest.fn();
-        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
 
-        // Arrange
-        render(<ToDoItemAdder toDoList={createToDoItems(3)} handleAdd={handleAddMock} />);
-
-        // Act
-        const input = screen.getByLabelText("todo-input");
-        userEvent.paste(input, faker.lorem.word());
-        userEvent.click(screen.getByText("Add To-Do Item"));
-
-        // Assert
-        await waitFor(() => {
-            expect(handleAddMock).toHaveBeenCalledTimes(1);
-        });
     });
 
     it("should not allow a user to add a duplicate to-do item", async () => {
-        const existingListItem = createToDoItems(1)[0];
-        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
-        
-        // Arrange
-        render(<ToDoItemAdder toDoList={[existingListItem]} handleAdd={jest.fn()} />);
 
-        // Act
-        const input = screen.getByLabelText("todo-input");
-        userEvent.paste(input, existingListItem.description);
-        userEvent.click(screen.getByText("Add To-Do Item"));
-
-        // Assert
-        await waitFor(async () => {
-            expect(await screen.findByText("You already have that on your list")).toBeInTheDocument();
-        });
-
-        //Act
-        userEvent.paste(input, faker.lorem.word());
-        userEvent.click(screen.getByText("Add To-Do Item"));
-
-        // Assert
-        await waitFor(() => {
-            expect(screen.queryByText("You already have that on your list")).not.toBeInTheDocument();
-        });
     });
 })
 

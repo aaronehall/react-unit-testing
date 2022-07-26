@@ -8,119 +8,29 @@ import { ToDoItem } from "../../services/toDoItem";
 describe("ToDoList", () => {
     // true unit test
     it("should load list items", async () => {
-        // Arrange
-        const toDoItems = createToDoItems(2);
-        jest.spyOn(toDoService, "getToDoList").mockResolvedValue(toDoItems);
 
-        // Act
-        render(<ToDoList />);
-
-        // Assert
-        expect(await screen.findByText(toDoItems[0].description)).toBeInTheDocument();
-        expect(await screen.findByText(toDoItems[1].description)).toBeInTheDocument();
     })
 
     // integration test: List component + Add component
     it("should allow the user to add an item", async () => {
-        // Arrange
-        const expectedNewItem = faker.lorem.word();
-        jest.spyOn(toDoService, "getToDoList")
-            .mockResolvedValueOnce([]) // initial load
-            .mockResolvedValueOnce([ { id: Math.random() * 100, description: expectedNewItem }]); // when component reloads
-        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
 
-        // Act
-        render(<ToDoList />);
-
-        const input = await screen.findByLabelText("todo-input");
-        userEvent.paste(input, expectedNewItem);
-        userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
-
-        // Assert
-        expect(await screen.findByText(expectedNewItem)).toBeInTheDocument();
     });
 
     // integration test: List component + Delete component
     it("should allow the user to delete an item", async () => {
-        // Arrange
-        const toDoItems = createToDoItems();
-        const toDoItemsWithoutFirstItem = toDoItems.filter(i => i.id !== toDoItems[0].id);
-        jest.spyOn(toDoService, "getToDoList")
-            .mockResolvedValueOnce(toDoItems) // initial load
-            .mockResolvedValueOnce(toDoItemsWithoutFirstItem); // after deletion
-        jest.spyOn(toDoService, "deleteToDoItem").mockResolvedValue(new Response());
-        const deleteButtonSelector = `delete-${toDoItems[0].description}-${toDoItems[0].id}`;
 
-        // Act
-        render(<ToDoList />);
-        userEvent.click(await screen.findByLabelText(deleteButtonSelector));
-
-        // Assert
-        await waitFor(() => {
-            expect(screen.queryByLabelText(deleteButtonSelector)).not.toBeInTheDocument()
-        });
     });
 
     it("should display the number of to-do items", async () => {
-        // Arrange
-        const toDoItems = createToDoItems(2);
-        const expectedNewItem = createToDoItems(1)[0];
-        jest.spyOn(toDoService, "getToDoList")
-            .mockResolvedValueOnce(toDoItems) // initial load
-            .mockResolvedValueOnce([...toDoItems, expectedNewItem]); // when component reloads
-        jest.spyOn(toDoService, "addToDoItem").mockResolvedValue(new Response());
 
-        // Act
-        render(<ToDoList />);
-
-        // Assert
-        expect(await screen.findByText("Number of To-Do List items: 2")).toBeInTheDocument();
-
-        // Act
-        const input = await screen.findByLabelText("todo-input");
-        userEvent.paste(input, expectedNewItem.description);
-        userEvent.click(screen.getByRole("button", { name: "Add To-Do Item" }));
-
-        // Assert
-        expect(await screen.findByText("Number of To-Do List items: 3")).toBeInTheDocument();
     });
 
     it("should display a message when the to-do list is complete", async () => {
-        // Arrange
-        const expectedText = "You did everything on your list!";
-        const toDoItems = createToDoItems(1);
-        jest.spyOn(toDoService, "getToDoList")
-            .mockResolvedValueOnce(toDoItems) // initial load
-            .mockResolvedValueOnce([]); // after delete
-        jest.spyOn(toDoService, "deleteToDoItem").mockResolvedValue(new Response());
 
-        // Act
-        render(<ToDoList />);
-        userEvent.click(await screen.findByLabelText(`delete-${toDoItems[0].description}-${toDoItems[0].id}`));
-
-        // Assert
-        expect(await screen.findByText(expectedText)).toBeInTheDocument();
     });
 
     it("should hide the complete message when the 'OK' button is clicked", async () => {
-        // Arrange
-        const expectedText = "You did everything on your list!";
-        const itemToDelete = createToDoItems(1)[0];
-        jest.spyOn(toDoService, "getToDoList")
-            .mockResolvedValueOnce([itemToDelete]) // initial load
-            .mockResolvedValueOnce([]); // after delete
-        jest.spyOn(toDoService, "deleteToDoItem").mockResolvedValue(new Response());
 
-        render(<ToDoList />);
-
-        // Act
-        userEvent.click(await screen.findByLabelText(`delete-${itemToDelete.description}-${itemToDelete.id}`));
-        userEvent.click(await screen.findByRole("button", { name: "OK" }))
-
-        // Assert
-        await waitFor(() => {
-            expect(screen.queryByText(expectedText)).not.toBeInTheDocument();
-        });
     });
 
     it("should show error text when user attempts to add an empty item", async () => {
